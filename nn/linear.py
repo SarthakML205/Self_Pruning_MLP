@@ -34,6 +34,8 @@ class Linear(Module):
         self.in_features = in_features
         self.out_features = out_features
 
+        # He/Kaiming init (variance 2/in_features): keeps forward-pass variance
+        # stable through ReLU so gradients do not vanish or explode early on.
         weight_data = _kaiming_uniform(in_features, out_features)
         self.weight = Tensor(weight_data, requires_grad=True)
         self.bias = Tensor(np.zeros(out_features, dtype=np.float64), requires_grad=True)

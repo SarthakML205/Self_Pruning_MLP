@@ -142,6 +142,7 @@ def train(
     verbose: bool = True,
 ) -> tuple[MLP, list[dict[str, float]], dict[str, float]]:
     """Train an MLP on sklearn Digits, optionally with progressive pruning."""
+    np.random.seed(seed)
     rng = np.random.default_rng(seed)
 
     train_x, train_y, val_x, val_y, test_x, test_y = load_digits_dataset(
