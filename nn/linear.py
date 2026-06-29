@@ -39,5 +39,11 @@ class Linear(Module):
         self.bias = Tensor(np.zeros(out_features, dtype=np.float64), requires_grad=True)
 
     def forward(self, x: Tensor) -> Tensor:
-        # Bias broadcasts along the batch dimension: (N, out) + (out,)
-        return (x @ self.weight) + self.bias
+        # Apply the pruning mask in the forward pass so dead connections
+        # cannot contribute even if numerical noise creeps into .data.
+        weight = self.weight
+        if weight.mask is not None:
+            mask_float = Tensor(weight.mask.astype(np.float64), requires_grad=False)
+            weight = weight * mask_float
+
+        return (x @ weight) + self.bias

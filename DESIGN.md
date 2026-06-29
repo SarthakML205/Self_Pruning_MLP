@@ -86,4 +86,74 @@ For the Digits proof-of-concept, these costs are acceptable. For million-paramet
 
 ---
 
-*Subsequent phases will extend this document with pruning schedule rationale, saliency vs. magnitude trade-offs, and analytical FLOP accounting.*
+## 3. Derive your importance criterion and explain why it approximates the loss change from removing a connection
+
+We prune unstructured weights by ranking them with a **saliency score** derived from a first-order Taylor expansion of the training loss.
+
+### Setup
+
+Let \(\mathcal{L}(w)\) be the mini-batch loss and \(w\) a scalar weight. Suppose the weight is **removed** by forcing it to zero. Define the perturbation:
+
+\[
+\Delta w = 0 - w = -w
+\]
+
+A first-order Taylor expansion of \(\mathcal{L}\) around the current \(w\) gives:
+
+\[
+\mathcal{L}(w + \Delta w) \approx \mathcal{L}(w) + \frac{\partial \mathcal{L}}{\partial w}\,\Delta w
+\]
+
+The **change in loss** from removing the connection is therefore:
+
+\[
+\Delta \mathcal{L} \approx \frac{\partial \mathcal{L}}{\partial w}\,(-w) = -\frac{\partial \mathcal{L}}{\partial w}\, w
+\]
+
+The **magnitude** of the predicted impact is:
+
+\[
+\left|\Delta \mathcal{L}\right| \approx \left|\frac{\partial \mathcal{L}}{\partial w}\, w\right|
+\]
+
+This is exactly the **Taylor saliency** score implemented in `SaliencyCriterion`:
+
+\[
+\text{score}(w) = \left| w \cdot \frac{\partial \mathcal{L}}{\partial w} \right|
+\]
+
+### Execution order matters
+
+The score uses `.grad` from the **current** backward pass. In `train/trainer.py` the batch loop is:
+
+1. `model.zero_grad()`
+2. forward + `loss.backward()`
+3. `pruner.step()` — scores computed here
+4. `optimizer.step()`
+
+If `optimizer.zero_grad()` ran before pruning, saliency would read stale or zero gradients and degenerate toward magnitude-only behavior.
+
+### Why this beats magnitude pruning
+
+| Criterion | Score | What it measures |
+|-----------|-------|------------------|
+| **Magnitude** | \(\|w\|\) | Static size of the weight |
+| **Saliency (Taylor)** | \(\|w \cdot \nabla_w \mathcal{L}\|\) | Predicted loss increase if \(w \to 0\) |
+
+A weight can be **small** yet sit on a steep loss slope (high gradient)—removing it hurts accuracy. Conversely, a **large** weight on a flat region (gradient \(\approx 0\)) contributes little to the current loss and is safe to prune.
+
+Magnitude pruning ignores the local loss landscape and often prunes weights that are still functionally important. Taylor saliency aligns pruning decisions with **immediate sensitivity** of \(\mathcal{L}\), which is why `SaliencyCriterion` is the default in Phase 3.
+
+### Schedule interaction (Zhu & Gupta cubic ramp)
+
+Sparsity follows:
+
+\[
+s(t) = s_{\text{target}} + (s_{\text{initial}} - s_{\text{target}})\left(1 - \frac{t}{T}\right)^3
+\]
+
+Early steps prune rapidly while the network has surplus capacity; later steps slow down as remaining weights become scarce and each removal is higher risk. The `Pruner` applies a **global** `np.percentile` threshold across all layers so the live budget is met exactly at each schedule step.
+
+---
+
+*Phase 4 will extend this document with analytical FLOP accounting and Pareto sweep results.*
