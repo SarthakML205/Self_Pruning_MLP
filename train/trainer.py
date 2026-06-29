@@ -52,24 +52,42 @@ def _iterate_minibatches(
         yield features[batch_idx], labels[batch_idx]
 
 
-def _train_val_split(
-    features: np.ndarray,
-    labels: np.ndarray,
-    val_fraction: float,
-    rng: np.random.Generator,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Hold out a validation subset for measuring pruned-model accuracy."""
+def load_digits_dataset(
+    seed: int,
+    val_fraction: float = 0.2,
+    test_fraction: float = 0.2,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Load Digits with train/val/test splits and feature standardization."""
+    rng = np.random.default_rng(seed)
+    features, labels = load_digits(return_X_y=True)
+    features = features.astype(np.float64)
+    labels = labels.astype(np.int64)
+
     num_samples = features.shape[0]
     val_size = max(1, int(num_samples * val_fraction))
+    test_size = max(1, int(num_samples * test_fraction))
+    if val_size + test_size >= num_samples:
+        raise ValueError("val_fraction + test_fraction must leave training samples")
+
     perm = rng.permutation(num_samples)
-    val_idx = perm[:val_size]
-    train_idx = perm[val_size:]
-    return (
-        features[train_idx],
-        labels[train_idx],
-        features[val_idx],
-        labels[val_idx],
-    )
+    test_idx = perm[:test_size]
+    val_idx = perm[test_size : test_size + val_size]
+    train_idx = perm[test_size + val_size :]
+
+    train_x = features[train_idx]
+    train_y = labels[train_idx]
+    val_x = features[val_idx]
+    val_y = labels[val_idx]
+    test_x = features[test_idx]
+    test_y = labels[test_idx]
+
+    mean = train_x.mean(axis=0, keepdims=True)
+    std = train_x.std(axis=0, keepdims=True) + 1e-8
+    train_x = (train_x - mean) / std
+    val_x = (val_x - mean) / std
+    test_x = (test_x - mean) / std
+
+    return train_x, train_y, val_x, val_y, test_x, test_y
 
 
 def _accuracy_from_logits(logits_data: np.ndarray, labels: np.ndarray) -> float:
@@ -77,14 +95,15 @@ def _accuracy_from_logits(logits_data: np.ndarray, labels: np.ndarray) -> float:
     return float(np.mean(predictions == labels))
 
 
-def _evaluate(
+def evaluate(
     model: MLP,
     features: np.ndarray,
     labels: np.ndarray,
     batch_size: int,
-    criterion: CrossEntropyLoss,
+    criterion: CrossEntropyLoss | None = None,
 ) -> tuple[float, float]:
     """Return mean loss and accuracy on a dataset without building a grad graph."""
+    loss_fn = criterion or CrossEntropyLoss()
     total_loss = 0.0
     total_correct = 0
     num_seen = 0
@@ -94,7 +113,7 @@ def _evaluate(
         batch_y = labels[start : start + batch_size]
         x = Tensor(batch_x, requires_grad=False)
         logits = model(x)
-        loss = criterion(logits, batch_y)
+        loss = loss_fn(logits, batch_y)
 
         batch_n = batch_x.shape[0]
         total_loss += float(loss.data) * batch_n
@@ -119,23 +138,20 @@ def train(
     target_sparsity: float = 0.0,
     pruning_criterion: CriterionName = "saliency",
     val_fraction: float = 0.2,
-) -> tuple[MLP, list[dict[str, float]]]:
+    test_fraction: float = 0.2,
+    verbose: bool = True,
+) -> tuple[MLP, list[dict[str, float]], dict[str, float]]:
     """Train an MLP on sklearn Digits, optionally with progressive pruning."""
     rng = np.random.default_rng(seed)
 
-    features, labels = load_digits(return_X_y=True)
-    features = features.astype(np.float64)
-    labels = labels.astype(np.int64)
-
-    train_x, train_y, val_x, val_y = _train_val_split(features, labels, val_fraction, rng)
-
-    mean = train_x.mean(axis=0, keepdims=True)
-    std = train_x.std(axis=0, keepdims=True) + 1e-8
-    train_x = (train_x - mean) / std
-    val_x = (val_x - mean) / std
+    train_x, train_y, val_x, val_y, test_x, test_y = load_digits_dataset(
+        seed=seed,
+        val_fraction=val_fraction,
+        test_fraction=test_fraction,
+    )
 
     num_features = train_x.shape[1]
-    num_classes = int(np.max(labels) + 1)
+    num_classes = int(np.max(np.concatenate([train_y, test_y])) + 1)
 
     model = MLP(num_features, hidden_size, num_classes)
     loss_fn = CrossEntropyLoss()
@@ -178,7 +194,7 @@ def train(
 
         train_loss = epoch_loss / num_seen
         train_acc = epoch_correct / num_seen
-        val_loss, val_acc = _evaluate(model, val_x, val_y, batch_size, loss_fn)
+        val_loss, val_acc = evaluate(model, val_x, val_y, batch_size, loss_fn)
         sparsity = pruner.actual_sparsity() if pruner is not None else 0.0
 
         metrics = {
@@ -189,13 +205,22 @@ def train(
             "sparsity": sparsity,
         }
         history.append(metrics)
-        print(
-            f"Epoch {epoch:02d}/{epochs} | "
-            f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc * 100:.2f}% | "
-            f"Val Acc: {val_acc * 100:.2f}% | Sparsity: {sparsity * 100:.2f}%"
-        )
+        if verbose:
+            print(
+                f"Epoch {epoch:02d}/{epochs} | "
+                f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc * 100:.2f}% | "
+                f"Val Acc: {val_acc * 100:.2f}% | Sparsity: {sparsity * 100:.2f}%"
+            )
 
-    return model, history
+    _, test_acc = evaluate(model, test_x, test_y, batch_size, loss_fn)
+    final_sparsity = pruner.actual_sparsity() if pruner is not None else 0.0
+    summary = {
+        "test_acc": test_acc,
+        "val_acc": history[-1]["val_acc"],
+        "train_acc": history[-1]["train_acc"],
+        "sparsity": final_sparsity,
+    }
+    return model, history, summary
 
 
 def main() -> None:
@@ -206,6 +231,13 @@ def main() -> None:
     parser.add_argument("--hidden-size", type=int, default=128)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--target-sparsity", type=float, default=0.0)
+    parser.add_argument("--prune", action="store_true", help="Enable progressive pruning.")
+    parser.add_argument(
+        "--sparsity",
+        type=float,
+        default=None,
+        help="Target sparsity when --prune is set (alias for --target-sparsity).",
+    )
     parser.add_argument(
         "--criterion",
         choices=["magnitude", "saliency"],
@@ -214,13 +246,19 @@ def main() -> None:
     parser.add_argument("--val-fraction", type=float, default=0.2)
     args = parser.parse_args()
 
-    _, history = train(
+    target_sparsity = args.target_sparsity
+    if args.sparsity is not None:
+        target_sparsity = args.sparsity
+    elif args.prune and target_sparsity == 0.0:
+        target_sparsity = 0.9
+
+    _, history, summary = train(
         epochs=args.epochs,
         batch_size=args.batch_size,
         learning_rate=args.lr,
         hidden_size=args.hidden_size,
         seed=args.seed,
-        target_sparsity=args.target_sparsity,
+        target_sparsity=target_sparsity,
         pruning_criterion=args.criterion,
         val_fraction=args.val_fraction,
     )
@@ -235,6 +273,7 @@ def main() -> None:
         f"\nTraining complete. "
         f"Train Acc: {final['train_acc'] * 100:.2f}% | "
         f"Val Acc: {final['val_acc'] * 100:.2f}% | "
+        f"Test Acc: {summary['test_acc'] * 100:.2f}% | "
         f"Sparsity: {final['sparsity'] * 100:.2f}%"
     )
 

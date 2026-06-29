@@ -1,0 +1,92 @@
+[2026-06-29T16:50:16Z] Sweep grid sparsities=[0.0, 0.5, 0.75, 0.9, 0.95] criteria=['magnitude', 'saliency'] seeds=[42, 1337, 777]
+[2026-06-29T16:50:16Z] Run 1/30
+[2026-06-29T16:50:16Z] START sparsity=0.00 criterion=magnitude seed=42
+[2026-06-29T16:50:17Z] DONE sparsity=0.00 criterion=magnitude seed=42 test_acc=98.05% actual_sparsity=0.00% sparse_flops=18944 flop_savings=0.00%
+[2026-06-29T16:50:17Z] Run 2/30
+[2026-06-29T16:50:17Z] START sparsity=0.00 criterion=magnitude seed=1337
+[2026-06-29T16:50:17Z] DONE sparsity=0.00 criterion=magnitude seed=1337 test_acc=97.21% actual_sparsity=0.00% sparse_flops=18944 flop_savings=0.00%
+[2026-06-29T16:50:17Z] Run 3/30
+[2026-06-29T16:50:17Z] START sparsity=0.00 criterion=magnitude seed=777
+[2026-06-29T16:50:18Z] DONE sparsity=0.00 criterion=magnitude seed=777 test_acc=97.49% actual_sparsity=0.00% sparse_flops=18944 flop_savings=0.00%
+[2026-06-29T16:50:18Z] Run 4/30
+[2026-06-29T16:50:18Z] START sparsity=0.00 criterion=saliency seed=42
+[2026-06-29T16:50:18Z] DONE sparsity=0.00 criterion=saliency seed=42 test_acc=96.94% actual_sparsity=0.00% sparse_flops=18944 flop_savings=0.00%
+[2026-06-29T16:50:18Z] Run 5/30
+[2026-06-29T16:50:18Z] START sparsity=0.00 criterion=saliency seed=1337
+[2026-06-29T16:50:18Z] DONE sparsity=0.00 criterion=saliency seed=1337 test_acc=96.66% actual_sparsity=0.00% sparse_flops=18944 flop_savings=0.00%
+[2026-06-29T16:50:18Z] Run 6/30
+[2026-06-29T16:50:18Z] START sparsity=0.00 criterion=saliency seed=777
+[2026-06-29T16:50:19Z] DONE sparsity=0.00 criterion=saliency seed=777 test_acc=97.49% actual_sparsity=0.00% sparse_flops=18944 flop_savings=0.00%
+[2026-06-29T16:50:19Z] Run 7/30
+[2026-06-29T16:50:19Z] START sparsity=0.50 criterion=magnitude seed=42
+[2026-06-29T16:50:20Z] DONE sparsity=0.50 criterion=magnitude seed=42 test_acc=96.94% actual_sparsity=50.00% sparse_flops=9568 flop_savings=49.49%
+[2026-06-29T16:50:20Z] Run 8/30
+[2026-06-29T16:50:20Z] START sparsity=0.50 criterion=magnitude seed=1337
+[2026-06-29T16:50:21Z] DONE sparsity=0.50 criterion=magnitude seed=1337 test_acc=97.21% actual_sparsity=50.00% sparse_flops=9568 flop_savings=49.49%
+[2026-06-29T16:50:21Z] Run 9/30
+[2026-06-29T16:50:21Z] START sparsity=0.50 criterion=magnitude seed=777
+[2026-06-29T16:50:22Z] DONE sparsity=0.50 criterion=magnitude seed=777 test_acc=98.61% actual_sparsity=50.00% sparse_flops=9578 flop_savings=49.44%
+[2026-06-29T16:50:22Z] Run 10/30
+[2026-06-29T16:50:22Z] START sparsity=0.50 criterion=saliency seed=42
+[2026-06-29T16:50:23Z] DONE sparsity=0.50 criterion=saliency seed=42 test_acc=98.61% actual_sparsity=50.00% sparse_flops=9442 flop_savings=50.16%
+[2026-06-29T16:50:23Z] Run 11/30
+[2026-06-29T16:50:23Z] START sparsity=0.50 criterion=saliency seed=1337
+[2026-06-29T16:50:24Z] DONE sparsity=0.50 criterion=saliency seed=1337 test_acc=97.49% actual_sparsity=50.00% sparse_flops=9454 flop_savings=50.10%
+[2026-06-29T16:50:24Z] Run 12/30
+[2026-06-29T16:50:24Z] START sparsity=0.50 criterion=saliency seed=777
+[2026-06-29T16:50:25Z] DONE sparsity=0.50 criterion=saliency seed=777 test_acc=98.05% actual_sparsity=50.00% sparse_flops=9444 flop_savings=50.15%
+[2026-06-29T16:50:25Z] Run 13/30
+[2026-06-29T16:50:25Z] START sparsity=0.75 criterion=magnitude seed=42
+[2026-06-29T16:50:26Z] DONE sparsity=0.75 criterion=magnitude seed=42 test_acc=96.94% actual_sparsity=75.01% sparse_flops=4796 flop_savings=74.68%
+[2026-06-29T16:50:26Z] Run 14/30
+[2026-06-29T16:50:26Z] START sparsity=0.75 criterion=magnitude seed=1337
+[2026-06-29T16:50:27Z] DONE sparsity=0.75 criterion=magnitude seed=1337 test_acc=97.21% actual_sparsity=75.01% sparse_flops=4800 flop_savings=74.66%
+[2026-06-29T16:50:27Z] Run 15/30
+[2026-06-29T16:50:27Z] START sparsity=0.75 criterion=magnitude seed=777
+[2026-06-29T16:50:28Z] DONE sparsity=0.75 criterion=magnitude seed=777 test_acc=98.05% actual_sparsity=75.01% sparse_flops=4794 flop_savings=74.69%
+[2026-06-29T16:50:28Z] Run 16/30
+[2026-06-29T16:50:28Z] START sparsity=0.75 criterion=saliency seed=42
+[2026-06-29T16:50:29Z] DONE sparsity=0.75 criterion=saliency seed=42 test_acc=96.10% actual_sparsity=75.01% sparse_flops=4734 flop_savings=75.01%
+[2026-06-29T16:50:29Z] Run 17/30
+[2026-06-29T16:50:29Z] START sparsity=0.75 criterion=saliency seed=1337
+[2026-06-29T16:50:30Z] DONE sparsity=0.75 criterion=saliency seed=1337 test_acc=97.49% actual_sparsity=75.01% sparse_flops=4732 flop_savings=75.02%
+[2026-06-29T16:50:30Z] Run 18/30
+[2026-06-29T16:50:30Z] START sparsity=0.75 criterion=saliency seed=777
+[2026-06-29T16:50:31Z] DONE sparsity=0.75 criterion=saliency seed=777 test_acc=98.05% actual_sparsity=75.01% sparse_flops=4740 flop_savings=74.98%
+[2026-06-29T16:50:31Z] Run 19/30
+[2026-06-29T16:50:31Z] START sparsity=0.90 criterion=magnitude seed=42
+[2026-06-29T16:50:32Z] DONE sparsity=0.90 criterion=magnitude seed=42 test_acc=96.94% actual_sparsity=90.00% sparse_flops=1922 flop_savings=89.85%
+[2026-06-29T16:50:32Z] Run 20/30
+[2026-06-29T16:50:32Z] START sparsity=0.90 criterion=magnitude seed=1337
+[2026-06-29T16:50:33Z] DONE sparsity=0.90 criterion=magnitude seed=1337 test_acc=96.38% actual_sparsity=90.00% sparse_flops=1922 flop_savings=89.85%
+[2026-06-29T16:50:33Z] Run 21/30
+[2026-06-29T16:50:33Z] START sparsity=0.90 criterion=magnitude seed=777
+[2026-06-29T16:50:34Z] DONE sparsity=0.90 criterion=magnitude seed=777 test_acc=96.94% actual_sparsity=90.00% sparse_flops=1922 flop_savings=89.85%
+[2026-06-29T16:50:34Z] Run 22/30
+[2026-06-29T16:50:34Z] START sparsity=0.90 criterion=saliency seed=42
+[2026-06-29T16:50:35Z] DONE sparsity=0.90 criterion=saliency seed=42 test_acc=96.38% actual_sparsity=90.00% sparse_flops=1892 flop_savings=90.01%
+[2026-06-29T16:50:35Z] Run 23/30
+[2026-06-29T16:50:35Z] START sparsity=0.90 criterion=saliency seed=1337
+[2026-06-29T16:50:36Z] DONE sparsity=0.90 criterion=saliency seed=1337 test_acc=96.66% actual_sparsity=90.00% sparse_flops=1898 flop_savings=89.98%
+[2026-06-29T16:50:36Z] Run 24/30
+[2026-06-29T16:50:36Z] START sparsity=0.90 criterion=saliency seed=777
+[2026-06-29T16:50:37Z] DONE sparsity=0.90 criterion=saliency seed=777 test_acc=96.38% actual_sparsity=90.00% sparse_flops=1894 flop_savings=90.00%
+[2026-06-29T16:50:37Z] Run 25/30
+[2026-06-29T16:50:37Z] START sparsity=0.95 criterion=magnitude seed=42
+[2026-06-29T16:50:38Z] DONE sparsity=0.95 criterion=magnitude seed=42 test_acc=96.94% actual_sparsity=95.01% sparse_flops=960 flop_savings=94.93%
+[2026-06-29T16:50:38Z] Run 26/30
+[2026-06-29T16:50:38Z] START sparsity=0.95 criterion=magnitude seed=1337
+[2026-06-29T16:50:39Z] DONE sparsity=0.95 criterion=magnitude seed=1337 test_acc=94.71% actual_sparsity=95.01% sparse_flops=960 flop_savings=94.93%
+[2026-06-29T16:50:39Z] Run 27/30
+[2026-06-29T16:50:39Z] START sparsity=0.95 criterion=magnitude seed=777
+[2026-06-29T16:50:40Z] DONE sparsity=0.95 criterion=magnitude seed=777 test_acc=96.38% actual_sparsity=95.01% sparse_flops=960 flop_savings=94.93%
+[2026-06-29T16:50:40Z] Run 28/30
+[2026-06-29T16:50:40Z] START sparsity=0.95 criterion=saliency seed=42
+[2026-06-29T16:50:41Z] DONE sparsity=0.95 criterion=saliency seed=42 test_acc=97.21% actual_sparsity=95.01% sparse_flops=952 flop_savings=94.97%
+[2026-06-29T16:50:41Z] Run 29/30
+[2026-06-29T16:50:41Z] START sparsity=0.95 criterion=saliency seed=1337
+[2026-06-29T16:50:42Z] DONE sparsity=0.95 criterion=saliency seed=1337 test_acc=95.82% actual_sparsity=95.01% sparse_flops=952 flop_savings=94.97%
+[2026-06-29T16:50:42Z] Run 30/30
+[2026-06-29T16:50:42Z] START sparsity=0.95 criterion=saliency seed=777
+[2026-06-29T16:50:43Z] DONE sparsity=0.95 criterion=saliency seed=777 test_acc=92.76% actual_sparsity=95.01% sparse_flops=942 flop_savings=95.03%
+[2026-06-29T16:50:43Z] Wrote results/summary.csv and results/pareto_curve.png
